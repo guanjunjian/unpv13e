@@ -20,11 +20,13 @@ main(int argc, char **argv)
 
 	Listen(listenfd, LISTENQ);
 
+	//1.、3.捕获SIGCHLD信号,并使用循环waitpid处理
 	Signal(SIGCHLD, sig_chld);	/* must call waitpid() */
 
 	for ( ; ; ) {
 		clilen = sizeof(cliaddr);
 		if ( (connfd = accept(listenfd, (SA *) &cliaddr, &clilen)) < 0) {
+			//2.处理SIGCHLD信号发生导致的系统调用中断
 			if (errno == EINTR)
 				continue;		/* back to for() */
 			else

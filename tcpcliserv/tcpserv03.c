@@ -25,6 +25,7 @@ main(int argc, char **argv)
 	for ( ; ; ) {
 		clilen = sizeof(cliaddr);
 		if ( (connfd = accept(listenfd, (SA *) &cliaddr, &clilen)) < 0) {
+			//自己重启被中断的系统调用
 			if (errno == EINTR)
 				continue;		/* back to for() */
 			else
