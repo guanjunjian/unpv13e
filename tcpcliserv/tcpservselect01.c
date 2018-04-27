@@ -4,7 +4,15 @@
 int
 main(int argc, char **argv)
 {
+	/*
+	* @maxi:client数组当前使用项的最大下标
+	* @maxfd：目前select监听的最大描述符
+	*/
 	int					i, maxi, maxfd, listenfd, connfd, sockfd;
+	/*
+	* @nready:本次调用select返回了几个就绪描述符
+	* @client[FD_SETSIZE]：存储客户套接字的数组
+	*/
 	int					nready, client[FD_SETSIZE];
 	ssize_t				n;
 	fd_set				rset, allset;
@@ -36,6 +44,7 @@ main(int argc, char **argv)
 		rset = allset;		/* structure assignment */
 		nready = Select(maxfd+1, &rset, NULL, NULL, NULL);
 
+		//如果监听套接字就绪
 		if (FD_ISSET(listenfd, &rset)) {	/* new client connection */
 			clilen = sizeof(cliaddr);
 			connfd = Accept(listenfd, (SA *) &cliaddr, &clilen);
@@ -45,11 +54,13 @@ main(int argc, char **argv)
 					ntohs(cliaddr.sin_port));
 #endif
 
+			//将新的客户套接字存入客户套接字数组
 			for (i = 0; i < FD_SETSIZE; i++)
 				if (client[i] < 0) {
 					client[i] = connfd;	/* save descriptor */
 					break;
 				}
+			//套接字数组已满
 			if (i == FD_SETSIZE)
 				err_quit("too many clients");
 
@@ -59,14 +70,17 @@ main(int argc, char **argv)
 			if (i > maxi)
 				maxi = i;				/* max index in client[] array */
 
+			//如果本次select只有监听套接字就绪，直接重新调用select		
 			if (--nready <= 0)
 				continue;				/* no more readable descriptors */
 		}
 
+		//处理已连接套接字
 		for (i = 0; i <= maxi; i++) {	/* check all clients for data */
 			if ( (sockfd = client[i]) < 0)
 				continue;
 			if (FD_ISSET(sockfd, &rset)) {
+				//已连接套接字读到EOF
 				if ( (n = Read(sockfd, buf, MAXLINE)) == 0) {
 						/*4connection closed by client */
 					Close(sockfd);
