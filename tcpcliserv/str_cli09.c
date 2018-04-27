@@ -16,10 +16,10 @@ str_cli(FILE *fp, int sockfd)
 		}
 		//将参数数据结构发送给服务器
 		Writen(sockfd, &args, sizeof(args));
-		//
+		//读取服务器回应
 		if (Readn(sockfd, &result, sizeof(result)) == 0)
 			err_quit("str_cli: server terminated prematurely");
-
+		//输出结果
 		printf("%ld\n", result.sum);
 	}
 }

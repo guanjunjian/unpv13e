@@ -32,6 +32,7 @@ str_cli(FILE *fp, int sockfd)
 		if (FD_ISSET(fileno(fp), &rset)) {  /* input is readable */
 			//读取标准输入
 			if (Fgets(sendline, MAXLINE, fp) == NULL)
+				//如果为NULL表示读到EOF,退出客户进程
 				return;		/* all done */
 			//将标准输入读到的内容写入套接字
 			Writen(sockfd, sendline, strlen(sendline));
