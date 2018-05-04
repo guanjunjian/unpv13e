@@ -10,6 +10,8 @@ main(int argc, char **argv)
 	ssize_t	n;
 	char	request[MAXLINE], reply[MAXN];
 
+	//要求输入 0.程序名 1.服务器的主机名或IP地址 2.服务器的端口 3.由客户fork的子进程数
+	//4.每个子进程发送给服务器的请求数 5.每个请求要求服务器返送的数据字节数
 	if (argc != 6)
 		err_quit("usage: client <hostname or IPaddr> <port> <#children> "
 				 "<#loops/child> <#bytes/request>");

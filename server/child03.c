@@ -25,8 +25,10 @@ child_main(int i, int listenfd, int addrlen)
 	printf("child %ld starting\n", (long) getpid());
 	for ( ; ; ) {
 		clilen = addrlen;
+		//获取文件锁
 		my_lock_wait();
 		connfd = Accept(listenfd, cliaddr, &clilen);
+		//释放文件锁
 		my_lock_release();
 
 		web_child(connfd);		/* process the request */

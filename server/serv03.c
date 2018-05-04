@@ -19,7 +19,7 @@ main(int argc, char **argv)
 		err_quit("usage: serv03 [ <host> ] <port#> <#children>");
 	nchildren = atoi(argv[argc-1]);
 	pids = Calloc(nchildren, sizeof(pid_t));
-
+	//初始化锁
 	my_lock_init("/tmp/lock.XXXXXX"); /* one lock file for all children */
 	for (i = 0; i < nchildren; i++)
 		pids[i] = child_make(i, listenfd, addrlen);	/* parent returns */

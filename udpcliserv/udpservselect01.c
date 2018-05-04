@@ -22,12 +22,14 @@ main(int argc, char **argv)
 	servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
 	servaddr.sin_port        = htons(SERV_PORT);
 
+	//设置SO_REUSEADDR套接字选项以防该端口上已有连接存在
 	Setsockopt(listenfd, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on));
 	Bind(listenfd, (SA *) &servaddr, sizeof(servaddr));
 
 	Listen(listenfd, LISTENQ);
 
 		/* 4create UDP socket */
+	//创建一个UDP套接字
 	udpfd = Socket(AF_INET, SOCK_DGRAM, 0);
 
 	bzero(&servaddr, sizeof(servaddr));
@@ -35,18 +37,23 @@ main(int argc, char **argv)
 	servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
 	servaddr.sin_port        = htons(SERV_PORT);
 
+	//绑定与TCP套接字相同的套接字，无需在调用Bind之前设置SO_REUSEADDR
+	//因为TCP端口是独立于UDP端口的
 	Bind(udpfd, (SA *) &servaddr, sizeof(servaddr));
 /* end udpservselect01 */
 
 /* include udpservselect02 */
+	//给SIGCHLD建立信号处理程序，因为TCP连接将由某个子进程处理
 	Signal(SIGCHLD, sig_chld);	/* must call waitpid() */
 
+	//初始化描述符
 	FD_ZERO(&rset);
 	maxfdp1 = max(listenfd, udpfd) + 1;
 	for ( ; ; ) {
 		FD_SET(listenfd, &rset);
 		FD_SET(udpfd, &rset);
 		if ( (nready = select(maxfdp1, &rset, NULL, NULL, NULL)) < 0) {
+			//子进程退出时，select返回-1，并且errno为EINTR,这里处理该错误
 			if (errno == EINTR)
 				continue;		/* back to for() */
 			else

@@ -5,6 +5,7 @@ static struct flock	lock_it, unlock_it;
 static int			lock_fd = -1;
 					/* fcntl() will fail if my_lock_init() not called */
 
+//调用者将一个路径名模板指定为my_lock_init的函数参数
 void
 my_lock_init(char *pathname)
 {
@@ -12,15 +13,18 @@ my_lock_init(char *pathname)
 
 		/* 4must copy caller's string, in case it's a constant */
     strncpy(lock_file, pathname, sizeof(lock_file));
+    //mktemp函数根据该模板创建一个唯一的路径名
     lock_fd = Mkstemp(lock_file);
-
+    //创建一个具备路径名的文件并立即unlink掉
     Unlink(lock_file);			/* but lock_fd remains open */
 
+    //初始化lock_it，用于上锁文件
 	lock_it.l_type = F_WRLCK;
 	lock_it.l_whence = SEEK_SET;
 	lock_it.l_start = 0;
 	lock_it.l_len = 0;
 
+	//初始化unlock_it，用于解锁文件
 	unlock_it.l_type = F_UNLCK;
 	unlock_it.l_whence = SEEK_SET;
 	unlock_it.l_start = 0;

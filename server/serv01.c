@@ -18,7 +18,11 @@ main(int argc, char **argv)
 		err_quit("usage: serv01 [ <host> ] <port#>");
 	cliaddr = Malloc(addrlen);
 
+	//处理子进程终止时发出的SIGCHLD信号
 	Signal(SIGCHLD, sig_chld);
+	//捕获由键入终端中断产生的SIGINT信号
+	//在客户运行完毕之后键入该键以显示服务器程序运行所需的CPU时间
+	//sig_int函数的工作就是输出CPU时间
 	Signal(SIGINT, sig_int);
 
 	for ( ; ; ) {
