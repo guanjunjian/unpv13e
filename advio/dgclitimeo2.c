@@ -9,6 +9,7 @@ dg_cli(FILE *fp, int sockfd, const SA *pservaddr, socklen_t servlen)
 
 	tv.tv_sec = 5;
 	tv.tv_usec = 0;
+	//设置超时
 	Setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv));
 
 	while (Fgets(sendline, MAXLINE, fp) != NULL) {
@@ -17,6 +18,7 @@ dg_cli(FILE *fp, int sockfd, const SA *pservaddr, socklen_t servlen)
 
 		n = recvfrom(sockfd, recvline, MAXLINE, 0, NULL, NULL);
 		if (n < 0) {
+			//如果超时，recvfrom返回-1，且errno设为EWOULDBLOCK
 			if (errno == EWOULDBLOCK) {
 				fprintf(stderr, "socket timeout\n");
 				continue;
