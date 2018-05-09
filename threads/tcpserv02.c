@@ -21,6 +21,9 @@ main(int argc, char **argv)
 
 	for ( ; ; ) {
 		len = addrlen;
+		//每次调用accpet时，首先调用malloc分配一个整数变量的内存空间，
+		//用于存放有待accept返回的已连接描述符，
+		//这使得每个线程都有各自的已连接描述符副本
 		iptr = Malloc(sizeof(int));
 		*iptr = Accept(listenfd, cliaddr, &len);
 		Pthread_create(&tid, NULL, &doit, iptr);
@@ -33,6 +36,7 @@ doit(void *arg)
 	int		connfd;
 
 	connfd = *((int *) arg);
+	//线程获取已连接描述符的值后调用free释放空间
 	free(arg);
 
 	Pthread_detach(pthread_self());

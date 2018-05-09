@@ -8,12 +8,14 @@ dg_cli(FILE *fp, int sockfd, const SA *pservaddr, socklen_t servlen)
 	int	n;
 	char	sendline[MAXLINE], recvline[MAXLINE + 1];
 
+	//建立信号处理函数
 	Signal(SIGALRM, sig_alrm);
 
 	while (Fgets(sendline, MAXLINE, fp) != NULL) {
 
 		Sendto(sockfd, sendline, strlen(sendline), 0, pservaddr, servlen);
 
+		//调用recvfrom前设置5秒的超时
 		alarm(5);
 		if ( (n = recvfrom(sockfd, recvline, MAXLINE, 0, NULL, NULL)) < 0) {
 			if (errno == EINTR)

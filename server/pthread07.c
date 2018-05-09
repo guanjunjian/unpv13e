@@ -23,8 +23,10 @@ thread_main(void *arg)
 	printf("thread %d starting\n", (int) arg);
 	for ( ; ; ) {
 		clilen = addrlen;
+		//上锁
     	Pthread_mutex_lock(&mlock);
 		connfd = Accept(listenfd, cliaddr, &clilen);
+		//解锁
 		Pthread_mutex_unlock(&mlock);
 		tptr[(int) arg].thread_count++;
 

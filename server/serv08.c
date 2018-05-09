@@ -36,13 +36,20 @@ main(int argc, char **argv)
 		clilen = addrlen;
 		connfd = Accept(listenfd, cliaddr, &clilen);
 
+		//获取对clifd的互斥访问
 		Pthread_mutex_lock(&clifd_mutex);
+		//将主线程accept的已连接套接字描述符存入clifd数组中
 		clifd[iput] = connfd;
+		//如果iput达到最大值，循环使用
 		if (++iput == MAXNCLI)
 			iput = 0;
+		//检查iput下标是否赶上iget下标
+		//如果赶上，说明数组不够大
 		if (iput == iget)
 			err_quit("iput = iget = %d", iput);
+		//释放信号量，如果有子进程睡眠于条件变量，则唤醒线程
 		Pthread_cond_signal(&clifd_cond);
+		//释放对clifd的互斥访问
 		Pthread_mutex_unlock(&clifd_mutex);
 	}
 }

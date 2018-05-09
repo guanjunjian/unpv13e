@@ -17,8 +17,10 @@ main(int argc, char **argv)
 	else
 		err_quit("usage: serv07 [ <host> ] <port#> <#threads>");
 	nthreads = atoi(argv[argc-1]);
+	//为存储线程信息的数组分配空间
 	tptr = Calloc(nthreads, sizeof(Thread));
 
+	//创建池中的线程
 	for (i = 0; i < nthreads; i++)
 		thread_make(i);			/* only main thread returns */
 

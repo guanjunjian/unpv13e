@@ -23,8 +23,11 @@ main(int argc, char **argv)
 
 	for ( ; ; ) {
 		clilen = addrlen;
+		//主线程阻塞于accept
 		connfd = Accept(listenfd, cliaddr, &clilen);
 
+		//当主线程返回一个客户连接时，调用Pthread_create创建一个新线程
+		//新线程执行的函数是doit，其参数是“已连接套接字”
 		Pthread_create(&tid, NULL, &doit, (void *) connfd);
 	}
 }
@@ -34,8 +37,11 @@ doit(void *arg)
 {
 	void	web_child(int);
 
+	//让自己脱离，使得主线程不必等待它
 	Pthread_detach(pthread_self());
+	//调用客户处理函数
 	web_child((int) arg);
+	//处理完毕后，该线程关闭“已连接套接字”
 	Close((int) arg);
 	return(NULL);
 }
