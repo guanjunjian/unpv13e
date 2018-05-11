@@ -10,6 +10,7 @@ main(int argc, char **argv)
 
 	bzero(&servaddr, sizeof(servaddr));
 	servaddr.sun_family = AF_LOCAL;
+	//#define UNIXSTR_PATH "/tmp/unix.str"
 	strcpy(servaddr.sun_path, UNIXSTR_PATH);
 
 	Connect(sockfd, (SA *) &servaddr, sizeof(servaddr));

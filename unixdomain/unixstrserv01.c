@@ -11,11 +11,12 @@ main(int argc, char **argv)
 
 	listenfd = Socket(AF_LOCAL, SOCK_STREAM, 0);
 
+	//#define UNIXSTR_PATH "/tmp/unix.str"
 	unlink(UNIXSTR_PATH);
 	bzero(&servaddr, sizeof(servaddr));
 	servaddr.sun_family = AF_LOCAL;
 	strcpy(servaddr.sun_path, UNIXSTR_PATH);
-
+	
 	Bind(listenfd, (SA *) &servaddr, sizeof(servaddr));
 
 	Listen(listenfd, LISTENQ);
