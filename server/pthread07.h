@@ -1,6 +1,6 @@
 typedef struct {
-  pthread_t		thread_tid;		/* thread ID */
-  long			thread_count;	/* # connections handled */
+  pthread_t		thread_tid;		/* 线程ID */
+  long			thread_count;	/* # 处理的客户数统计 */
 } Thread;
 Thread	*tptr;		/* array of Thread structures; calloc'ed */
 
