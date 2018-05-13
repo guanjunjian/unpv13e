@@ -15,6 +15,7 @@ main(int argc, char **argv)
 	servaddr.sin_addr.s_addr = inet_addr(argv[1]);
 	servaddr.sin_port        = htons(13);	/* daytime server */
 
+	//调用非阻塞式connect
 	if (connect_nonb(sockfd, (SA *) &servaddr, sizeof(servaddr), 0) < 0)
 		err_sys("connect error");
 

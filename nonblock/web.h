@@ -1,13 +1,14 @@
 #include	"unp.h"
 
+//本程序最多度MAXFILES个来自Web服务器的文件
 #define	MAXFILES	20
 #define	SERV		"80"	/* port number or service name */
 
 struct file {
-  char	*f_name;			/* filename */
-  char	*f_host;			/* hostname or IPv4/IPv6 address */
-  int    f_fd;				/* descriptor */
-  int	 f_flags;			/* F_xxx below */
+  char	*f_name;			/* 文件名（复制自命令行参数） */
+  char	*f_host;			/* 文件所在服务器主机名或IP名 */
+  int    f_fd;				/* 用于读取文件的套接字描述符 */
+  int	 f_flags;			/* 用于指定准备对文件执行什么操作（连接、读取或完成）的一组标志*/
 } file[MAXFILES];
 
 #define	F_CONNECTING	1	/* connect() in progress */
