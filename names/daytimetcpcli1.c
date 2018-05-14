@@ -15,21 +15,31 @@ main(int argc, char **argv)
 	if (argc != 3)
 		err_quit("usage: daytimetcpcli1 <hostname> <service>");
 
+	//第一个命令行参数是主机名
 	if ( (hp = gethostbyname(argv[1])) == NULL) {
+		//如果gethostbyname查找失败
+		//使用inet_aton判断argv[1]是否已经是ASCII格式的地址
+		//inet_aton:将第一个参数所指的C字符串转换成32位的网络字节序二进制值，并通过第二个参数来存储
 		if (inet_aton(argv[1], &inetaddr) == 0) {
 			err_quit("hostname error for %s: %s", argv[1], hstrerror(h_errno));
 		} else {
+			//如果已经是ASCII格式的地址
+			//构造一个由相应的地址构成的单元素列表
 			inetaddrp[0] = &inetaddr;
+			//表示达到尾元素，与h_addr_list做法一样
 			inetaddrp[1] = NULL;
 			pptr = inetaddrp;
 		}
 	} else {
+		//gethostbyname查找成功
 		pptr = (struct in_addr **) hp->h_addr_list;
 	}
 
+	//第二个参数是服务名
 	if ( (sp = getservbyname(argv[2], "tcp")) == NULL)
 		err_quit("getservbyname error for %s", argv[2]);
 
+	//该循环为服务器主机的每个地址执行一次，直到connect成功或IP地址列表试完为止
 	for ( ; *pptr != NULL; pptr++) {
 		sockfd = Socket(AF_INET, SOCK_STREAM, 0);
 
@@ -43,6 +53,7 @@ main(int argc, char **argv)
 		if (connect(sockfd, (SA *) &servaddr, sizeof(servaddr)) == 0)
 			break;		/* success */
 		err_ret("connect error");
+		//如果connect失败，必须关闭套接字，并重新创建一个新的套接字使用
 		close(sockfd);
 	}
 	if (*pptr == NULL)

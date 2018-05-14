@@ -14,14 +14,17 @@ struct file {
 #define	F_CONNECTING	1	/* connect() in progress */
 #define	F_READING		2	/* connect() complete; now reading */
 #define	F_DONE			4	/* all done */
-#define	F_JOINED		8	/* main has pthread_join'ed */
+#define	F_JOINED		8	/* 线程已经被JOIN过 */
 
 #define	GET_CMD		"GET %s HTTP/1.0\r\n\r\n"
 
 int		nconn, nfiles, nlefttoconn, nlefttoread;
 
+//已经终止但还未join的线程数，需要对其join
 int				ndone;		/* number of terminated threads */
+//对ndone的互斥量
 pthread_mutex_t	ndone_mutex = PTHREAD_MUTEX_INITIALIZER;
+//条件变量
 pthread_cond_t	ndone_cond = PTHREAD_COND_INITIALIZER;
 
 void	*do_get_read(void *);
@@ -69,6 +72,8 @@ main(int argc, char **argv)
 		}
 
 			/* 4Wait for thread to terminate */
+		//当发现某个线程终止时，我们遍历所有file结构找出这个线程（F_DONE状态）
+		//对其调用Pthread_join，并设置为F_JOINED
 		Pthread_mutex_lock(&ndone_mutex);
 		while (ndone == 0)
 			Pthread_cond_wait(&ndone_cond, &ndone_mutex);
@@ -120,6 +125,7 @@ do_get_read(void *vptr)
 	Close(fd);
 	fptr->f_flags = F_DONE;		/* clears F_READING */
 
+	//在本线程终止之前递增ndone并使用条件变量通知主线程
 	Pthread_mutex_lock(&ndone_mutex);
 	ndone++;
 	Pthread_cond_signal(&ndone_cond);

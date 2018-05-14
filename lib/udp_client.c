@@ -25,6 +25,7 @@ udp_client(const char *host, const char *serv, SA **saptr, socklen_t *lenp)
 	if (res == NULL)	/* errno set from final socket() */
 		err_sys("udp_client error for %s, %s", host, serv);
 
+	//用于分配一个套接字地址结构的内存空间
 	*saptr = Malloc(res->ai_addrlen);
 	memcpy(*saptr, res->ai_addr, res->ai_addrlen);
 	*lenp = res->ai_addrlen;

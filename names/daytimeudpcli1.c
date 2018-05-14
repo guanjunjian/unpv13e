@@ -11,6 +11,7 @@ main(int argc, char **argv)
 	if (argc != 3)
 		err_quit("usage: daytimeudpcli1 <hostname/IPaddress> <service/port#>");
 
+	//获得一个UDP套接字，注意这里的salen
 	sockfd = Udp_client(argv[1], argv[2], (void **) &sa, &salen);
 
 	printf("sending to %s\n", Sock_ntop_host(sa, salen));
