@@ -7,6 +7,7 @@ home_page(const char *host, const char *fname)
 	char	line[MAXLINE];
 
 	//建立一个与服务器的连接
+	//阻塞式connect
 	fd = Tcp_connect(host, SERV);	/* blocking connect() */
 
 	//发出一个HTTP GET命令以获取主页（文件名经常是/）
